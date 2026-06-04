@@ -12,3 +12,9 @@ El script `analisis_luxury_effect.R` está organizado de forma modular siguiendo
 ## Librerías Necesarias
 Para reproducir este análisis es necesario contar con R y tener instalados los siguientes paquetes:
 `sf`, `dplyr`, `readxl`, `patchwork`, `ggplot2`, `spatstat`, `spdep`, `rgeoda`, `tmap`, `RColorBrewer`.
+
+## Nota sobre los Datos Geográficos
+Para ejecutar el script localmente, es necesario descargar el Shapefile oficial del **Seccionado INE 2023** desde la web del Instituto Nacional de Estadística debido a que supera el límite de tamaño de almacenamiento de GitHub. 
+
+Se debe ubicar el archivo descomprimido en la siguiente ruta relativa dentro de tu directorio de trabajo:
+`secciones_ine/España_Seccionado2023_ETRS89H30/SECC_CE_20230101.shp`
