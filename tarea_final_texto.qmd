@@ -1,0 +1,375 @@
+---
+title: "Análisis espacial del *Luxury Effect* en el arbolado de Valencia"
+author: Miguel Hidalgo Soriano
+format: 
+  pdf:
+    echo: false
+    message: false
+    warning: false
+editor: visual
+
+---
+# RESUMEN
+
+La presencia de vegetación urbana está influida por el entorno físico y la situación socioeconómica. Este estudio evalúa dicha relación en Valencia en 2023 para analizar si la distribución del arbolado viario responde al Luxury Effect o a factores estructurales. Metodológicamente se integraron datos de la Renta Media por Hogar del INE y el censo georreferenciado del arbolado en R, combinando procesos puntuales, funciones de Ripley, Índice de Moran y mapas LISA. Los resultados descartan la aleatoriedad de la masa arbórea y muestran una autocorrelación espacial positiva. Sin embargo, se rechaza la hipótesis del Luxury Effect para Valencia debido al triunfo del Legacy Effect o Efecto Herencia. El centro histórico y el Ensanche muestran escasez de árboles por las limitaciones físicas de sus calles estrechas, mientras que las periferias modernas de rentas medias-bajas disfrutan de gran abundancia de árboles gracias al diseño urbanístico de su época. El sector marítimo de El Grau y Nazaret destaca como un punto crítico donde la reciente revalorización económica y las nuevas rentas conviven con una marcada escasez arbórea de carácter histórico. Asimismo, se detectó un sesgo estadístico al sur por la extensión rústica de la huerta. Por ello, se concluye que el arbolado de Valencia no es uniforme y que la planificación del pasado alarga la falta de árboles en puntos vulnerables, lo que demanda futuras investigaciones para evaluar la calidad de las especies e integrar parques o grandes zonas verdes.
+
+
+# INTRODUCCIÓN
+
+En las últimas décadas, la planificación de las ciudades ha dejado de considerar a los árboles y a los parques como simples elementos de adorno para reconocerlos como una pieza fundamental de la salud, la habitabilidad y la sostenibilidad urbana. El arbolado de las calles y las zonas verdes no solo definen el paisaje del entorno en el que vivimos, sino que ofrecen beneficios ambientales y servicios de regulación que resultan críticos en el día a día. Entre ellos destacan la reducción del efecto de isla de calor ayudando a bajar las temperaturas en los meses de verano, la absorción de los gases contaminantes del aire, la amortiguación del ruido del tráfico y la mejora demostrada del bienestar tanto físico como emocional de los ciudadanos (Leong et al., 2018). Un claro testimonio de la importancia de estas dinámicas es el caso de la ciudad de Valencia, la cual ha sido galardonada internacionalmente en tres ocasiones con el reconocimiento Tree Cities of the World (otorgado conjuntamente por The Arbor Day Foundation y la Organización de las Naciones Unidas para la Alimentación y la Agricultura). Este distintivo de prestigio mundial certifica que el municipio cumple con unos estándares globales muy exigentes en la catalogación, el cuidado y la gestión de su arbolado urbano, situándola como un referente en políticas ambientales.
+
+Sin embargo, los estudios y la literatura científica internacional demuestran que el hecho de que una ciudad tenga una gestión excelente a nivel global, o cuente con abundantes recursos naturales, no garantiza en absoluto que estos se repartan de forma justa y equitativa por todos sus barrios. La presencia y distribución de la naturaleza dentro de las ciudades suele estar fuertemente influenciada por la historia del crecimiento urbano y por factores económicos. En este contexto teórico se ha consolidado el concepto del Luxury Effect (Efecto Lujo), el cual plantea que la riqueza ecológica, la biodiversidad urbana y la densidad de la vegetación no se distribuyen al azar, sino que tienden a concentrarse de manera desproporcionada en aquellas zonas habitadas por los residentes con mayor poder adquisitivo (Leong et al., 2018). Investigaciones recientes como la de Calderón (2025) analizan estos determinantes socioeconómicos subyacentes, mientras que estudios a gran escala confirman que tanto las inversiones públicas como las fuerzas del mercado inmobiliario sesgan el beneficio de la sombra hacia los barrios con mayores ingresos, forzando sistemáticamente a los sectores más vulnerables a habitar en entornos urbanos degradados y grises (McDonald et al., 2024).
+
+En España, el estudio de Aznarez et al. (2023) en Vitoria-Gasteiz demostró matemáticamente esta realidad al vincular de forma positiva el nivel de estudios, como indicador de posición socioeconómica, con la biodiversidad urbana. No obstante, este mismo estudio advierte de que el Efecto Lujo estático puede verse matizado, o incluso contrarrestado, por el denominado Efecto Herencia (Legacy Effect). Este enfoque postula que la configuración de la infraestructura verde actual no siempre refleja la capacidad económica contemporánea de los vecinos, sino las decisiones de planificación, las normativas de diseño del suelo y las transformaciones urbanísticas del momento histórico en el que se consolidó cada barrio (Leong et al., 2018). Asimismo, la traducción de la riqueza en vegetación puede verse condicionada por la morfología y la densidad del tejido construido, existiendo barreras arquitectónicas insalvables que alteran estos patrones socio-ambientales (Aznarez et al., 2023). Cuando el acceso a un entorno arbolado y a sus beneficios deja de ser una experiencia universal y se convierte en un beneficio que depende de herencias estructurales o del dinero disponible, la desigualdad ambiental pasa a ser un problema real de injusticia social (Perkins et al., 2026).  
+
+A pesar del amplio volumen de literatura científica desarrollado sobre el Efecto Lujo y el Efecto Herencia en Norteamérica o en el norte de Europa, el análisis detallado de la interacción de ambos fenómenos en las ciudades de la cuenca mediterránea sigue estando muy poco documentado. Valencia presenta una estructura urbana muy particular, caracterizada por un centro histórico muy compacto, zonas con una alta densidad de población y barrios en la periferia con historias de desarrollo y niveles económicos muy diversos. Al concentrar realidades sociales, cronologías urbanísticas y estructuras morfológicas tan distintas en un espacio relativamente reducido, la ciudad se convierte en el escenario idóneo para comprobar si las diferencias sociales influyen en la presencia de vegetación en las calles de la misma forma que ocurre en otros países, o si las herencias del diseño urbano introducen dinámicas asimétricas propias.
+
+Por todo ello, esta investigación tiene como propósito cubrir ese vacío en la literatura actual, analizando la dotación del arbolado de las calles con un nivel de detalle muy alto. Para lograrlo, se utilizan datos oficiales de carácter espacial para evaluar si la planificación verde de la ciudad ha sido equitativa o si, por el contrario, el beneficio de la sombra ha quedado condicionado por los recursos económicos de cada barrio o por las características de su herencia urbanística. Se plantea así la cuestión de si existe una distribución asimétrica y desigual de los árboles en la ciudad de Valencia que responda al patrón del Efecto Lujo, concentrando una mayor cantidad de vegetación en las zonas que registran una mayor renta media por hogar durante el año 2023, o si intervienen otros factores de legado y morfología urbana. 
+
+Para dar una respuesta rigurosa a este interrogante, de manera más detallada y por pasos, se persiguen los siguientes objetivos específicos:
+
+-Cartografiar y comparar la distribución territorial de la Renta Media por Hogar y la presencia del arbolado público urbano, utilizando las secciones censales del municipio correspondientes al año 2023 como unidad básica de análisis regional.
+
+-Contrastar la existencia de dependencias espaciales significativas en la distribución de ambas variables, determinando estadísticamente si los niveles de riqueza y la densidad de la vegetación tienden a agruparse en el espacio urbano o si se distribuyen de manera aleatoria.
+
+-Identificar y localizar geográficamente los focos de desigualdad socio-ambiental, detectando las zonas de la ciudad donde coexisten la escasez de recursos económicos y la falta de masa forestal viaria, así como los sectores donde se concentra el privilegio ambiental.
+
+
+# METODOLOGÍA 
+
+Para evaluar la relación espacial entre el nivel socioeconómico de la población y la infraestructura verde en la ciudad de Valencia, se establece un procedimiento metodológico estructurado en tres fases consecutivas. Este enfoque combina la integración de datos regionales y el análisis de la distribución espacial mediante procesos puntuales utilizando el entorno de programación estadística R y RStudio como herramienta tecnológica principal.
+
+## Importación y Estructuración de Datos Regionales y Geometrías
+
+El análisis parte de la recopilación e integración de dos fuentes de información con estructuras diferentes. Por un lado, los datos socioeconómicos de la Renta Media por Hogar del año 2023, procedentes del Instituto Nacional de Estadística (INE), los cuales se organizan a nivel de secciones censales dentro del municipio de Valencia. Como paso previo a su estructuración, se realiza una depuración del conjunto de datos eliminando los registros vacíos, ya que el INE no proporciona información de renta en aquellas secciones con una población demasiado reducida
+
+Por otro lado, el inventario del arbolado viario proporcionado por el Ayuntamiento de Valencia se incorpora directamente como un proceso puntual georreferenciado, donde cada registro incluye su geometría con las coordenadas espaciales exactas. La importación de este objeto vectorial ayuda a posicionar de manera directa la ubicación de cada árbol como un punto en el mapa de la ciudad. El conjunto de datos del arbolado viario cuenta con información detallada de cada ejemplar, destacando variables clave como el identificador único del elemento, la especie botánica, el tipo de espacio urbano donde se localiza y las coordenadas geográficas precisas asociadas a la columna geométrica.
+
+Una vez obtenidas ambas capas en R, se utiliza la librería especializada sf para asegurar que ambas bases de datos compartan el mismo Sistema de Referencia de Coordenadas (CRS), condición indispensable para garantizar la exactitud de cualquier cruce espacial posterior. Debido a que las secciones censales presentan tamaños heterogéneos en el territorio, siendo muy compactas en el centro histórico y mucho más extensas en la periferia, el estudio metodológico requiere estandarizar los datos. Para ello, se realiza una intersección espacial para contabilizar el número de árboles contenidos en cada sección censal, dividiendo posteriormente dicho valor por la superficie en kilómetros cuadrados de cada área. De este modo, se construye la variable de Densidad de Arbolado Viario por $km^2$, permitiendo una comparación equitativa entre todas las unidades regionales de la ciudad.
+
+## Análisis de Procesos Puntuales aplicado al Arbolado
+
+Con los puntos de los árboles localizados en el mapa mediante su geometría, se analiza de forma independiente la distribución de la masa verde a través de la teoría de procesos puntuales. El objetivo de esta fase es determinar si la plantación del arbolado urbano responde a un patrón de Aleatoriedad Espacial Completa (CSR), a una distribución dispersa o si, por el contrario, muestran una clara tendencia al agrupamiento espacial.
+
+Para aplicar las funciones estadísticas de la librería spatstat, los puntos del arbolado se transforman en un objeto especial denominado ppp (Planar Point Pattern). Este formato requiere definir una ventana de observación (owin) que delimita los márgenes del mapa de Valencia a partir de sus coordenadas extremas. Al estructurar los datos de esta manera, el software puede detectar y gestionar correctamente aquellos árboles que comparten la misma coordenada exacta en el registro público.
+
+Una vez estructurado el objeto ppp, se evalúa la hipótesis de aleatoriedad espacial completa (CSR) mediante métodos basados en distancias. Para ello, se utiliza la función envelope() con el fin de generar múltiples simulaciones del proceso y construir unos entornos de confianza para la función G, midiendo la distancia de cada punto a su vecino más cercano. Asimismo, se evalúa la aleatoriedad mediante la función K de Ripley para observar la diferencia entre el comportamiento teórico esperado en un entorno aleatorio y las estimaciones reales, para poder comprobar de forma global si la ubicación de los árboles en las calles sigue un patrón aleatorio o agrupado.
+
+## Geoestadística y Análisis de Asociación Espacial
+
+El contraste definitivo de la hipótesis del Luxury Effect se realiza uniendo las dos variables calculadas para cada una de las secciones censales, la Renta Media por Hogar y la Densidad de Arbolado. En el análisis de datos geográficos es necesario aplicar herramientas específicas de análisis espacial y autocorrelación espacial, debido a que el nivel de renta o la densidad verde de una sección censal concreta suelen estar condicionados por las características de las secciones colindantes.
+
+En primer lugar, se calcula el test estadístico de la I de Moran Global mediante el paquete spdep con el fin de evaluar matemáticamente si existe un patrón de agrupamiento generalizado en toda la ciudad, determinando si las secciones censales con valores similares tienden a concentrarse juntas en el espacio o si su distribución es casual.
+
+Finalmente, para localizar geográficamente los focos de desigualdad, el análisis se complementa con indicadores locales de asociación espacial LISA. Esta técnica detalla el índice global a través de la librería especializada rgeoda, la cual analiza qué secciones censales son vecinas entre sí para clasificar los barrios en grupos específicos con significación estadística. Mediante este procedimiento identificamos tanto las zonas de privilegio ambiental, que son los grupos con altas rentas y alta densidad de árboles, como los puntos de vulnerabilidad urbana, que presentan baja renta y escasez de arbolado, aportando las pruebas necesarias para responder a la pregunta de la investigación.
+
+
+# RESULTADOS
+
+```{r librerías, warning=FALSE}
+library(sf)
+library(dplyr)
+library(readxl)
+#install.packages("patchwork")
+library(patchwork) 
+library(ggplot2)
+library(spatstat)
+library(spdep)
+library(rgeoda)
+library(tmap)
+library(RColorBrewer)
+```
+
+
+
+```{r}
+
+# Carga del censo de arbolado urbano de Valencia ciudad
+ruta_arbolado <- "arbolado"
+censo_arboles <- sf::st_read(ruta_arbolado, quiet = TRUE)
+
+# Carga del archivo de renta 
+ruta_renta <- "renta_hogar.xlsx" 
+
+renta_bruta <- readxl::read_excel(
+  path = ruta_renta,
+  sheet = 1,                 
+  skip = 8,                  
+  col_names = FALSE,        
+  col_types = c("text", "numeric")
+)
+
+# Nos aseguramos de quedarnos con las dos primeras columnas esenciales y les damos nombre limpio
+renta_bruta <- renta_bruta[, 1:2]
+names(renta_bruta) <- c("seccion_texto", "renta_medio_hogar")
+
+#Filtrado estricto: Nos quedamos SOLO con las secciones de Valencia Ciudad
+renta_valencia_ciudad <- renta_bruta %>%
+  dplyr::filter(!is.na(seccion_texto)) %>%
+  dplyr::filter(base::substr(seccion_texto, 1, 5) == "46250") %>%
+  dplyr::mutate(
+    # Limpiamos el código para quedarnos solo con el número de 11 dígitos
+    codigo_seccion = base::substr(seccion_texto, 1, 11)
+  ) %>%
+  dplyr::select(codigo_seccion, renta_medio_hogar)
+
+```
+
+
+```{r}
+# Filtramos los registros vacíos (NA) 
+renta_valencia_limpia <- renta_valencia_ciudad %>%
+  dplyr::filter(!is.na(renta_medio_hogar))
+
+# Carga del Shapefile oficial del INE
+ruta_ine <- "secciones_ine/España_Seccionado2023_ETRS89H30/SECC_CE_20230101.shp" 
+secciones_espana <- sf::st_read(ruta_ine, quiet = TRUE)
+
+# Filtramos el mapa de España para quedarnos solo con Valencia ciudad (46250)
+secciones_valencia <- secciones_espana %>%
+  dplyr::filter(CUMUN == "46250")
+
+# Control y unificación del Sistema de Referencia de Coordenadas (CRS)
+crs_arboles <- sf::st_crs(censo_arboles)
+secciones_valencia <- sf::st_transform(secciones_valencia, crs = crs_arboles)
+
+# Unión de la geometría con la renta limpia quitando el espacio en blanco intruso
+secciones_economicas <- secciones_valencia %>%
+  dplyr::inner_join(
+    renta_valencia_limpia %>% dplyr::mutate(codigo_seccion = base::trimws(codigo_seccion)), 
+    by = c("CUSEC" = "codigo_seccion")
+  )
+```
+
+```{r}
+# Recuento de árboles dentro de cada polígono de sección censal
+secciones_con_arboles <- secciones_economicas %>%
+  dplyr::mutate(
+    num_arboles = base::lengths(sf::st_intersects(secciones_economicas, censo_arboles))
+  )
+
+# Cálculo de la superficie de cada sección en kilómetros cuadrados
+secciones_con_arboles <- secciones_con_arboles %>%
+  dplyr::mutate(
+    superficie_m2 = sf::st_area(.),
+    superficie_km2 = base::as.numeric(superficie_m2) / 1000000
+  )
+
+# Cálculo de la variable final: Densidad de arbolado por km2
+secciones_finales <- secciones_con_arboles %>%
+  dplyr::mutate(
+    densidad_arboles_km2 = num_arboles / superficie_km2
+  ) %>%
+  dplyr::select(CUSEC, renta_medio_hogar, num_arboles, superficie_km2, densidad_arboles_km2)
+```
+### Análisis Descriptivo Espacial
+
+La comparación cartográfica de Valencia revela una clara división espacial en la riqueza que contrasta con la distribución irregular de la infraestructura verde urbana, visible en la Figura 1. El análisis de la renta media muestra una concentración de niveles socioeconómicos elevados en el centro histórico y el ensanche que se expande hacia el norte, mientras que las menores rentas se sitúan hacia el oeste y el sur. Por su parte, el mapa del arbolado evidencia que la alta densidad verde se focaliza en puntos muy específicos y aislados dentro del núcleo urbano, reflejando que la vegetación no sigue un patrón uniforme. En cambio, en las zonas del sur los valores parecen casi nulos debido a un sesgo por el tamaño de las secciones, ya que al dividir los árboles urbanos entre la superficie total, las grandes áreas agrícolas de la periferia sufren una subestimación analítica de su cobertura. Este contraste visual entre la continuidad de la renta y la concentración puntual del arbolado justifica el uso de la estadística espacial para evaluar formalmente la hipótesis del Efecto Lujo.
+
+**Figura 1** *Mapas descriptivos de la Renta Media por Hogar y la Densidad de Arbolado Viario en Valencia.*
+```{r mapa-descriptivo-doble, fig.width=14, fig.height=7}
+# Configuración de etiquetas
+formato_es <- scales::label_comma(big.mark = ".", decimal.mark = ",")
+
+# Mapa A: Renta Media por Hogar
+mapa_renta <- ggplot(data = secciones_finales) +
+  geom_sf(aes(fill = renta_medio_hogar), color = "white", size = 0.005) +
+  scale_fill_viridis_c(
+    option = "viridis", 
+    name = "Renta (€)", 
+    labels = formato_es
+  ) +
+  labs(
+    title = "Renta Media por Hogar (2023)",
+    subtitle = "Secciones censales de Valencia"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 10, color = "gray30"),
+    legend.position = "right",
+    panel.grid = element_blank(),
+    axis.text = element_blank()
+  )
+
+# Mapa B: Densidad de Arbolado Viario
+mapa_verde <- ggplot(data = secciones_finales) +
+  geom_sf(aes(fill = densidad_arboles_km2), color = "white", size = 0.005) +
+ scale_fill_viridis_c(
+  option = "viridis",          
+  name = "Árboles / km²",
+  labels = formato_es,
+  limits = c(0, 400),          
+  oob = scales::squish         
+) +
+  labs(
+    title = "Densidad de Arbolado Viario",
+    subtitle = "Estandarizado por km²"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 10, color = "gray30"),
+    legend.position = "right",
+    panel.grid = element_blank(),
+    axis.text = element_blank()
+  )
+
+# Combinamos ambos mapas dejando espacio suficiente
+mapa_renta + mapa_verde
+```
+
+## Análisis de Procesos Puntuales
+
+Los resultados derivados de las funciones de distancia globales descartan el supuesto de Aleatoriedad Espacial Completa para el arbolado viario de Valencia. Al modelar el censo como un patrón de puntos planos dentro de la ventana de observación que delimita el contorno municipal,Los resultados de los tests empíricos muestran que la vegetación en Valencia no se distribuye de forma aleatoria, sino que tiende a agruparse en el espacio de manera estadísticamente significativa, alejándose por completo de una distribución espontánea.
+
+El análisis de la Función G muestra que la distribución real de los árboles se aleja de lo que sería un patrón puramente aleatorio a partir de una distancia de 25 metros. Al superar el límite de la banda de confianza que marcan las simulaciones, el test confirma que existe una fuerte atracción espacial a pequeña escala. Esto se debe a la propia planificación de la ciudad, donde los árboles se agrupan de forma continua a lo largo de las aceras y calles, por lo que la probabilidad de encontrar ejemplares seguidos es muchísimo mayor que si se hubieran plantado al azar.
+
+De igual manera, la evaluación mediante la Función K de Ripley ratifica este fenómeno de agrupación a una escala mayor. La curva real se sitúa muy por encima de las bandas de confianza simuladas a lo largo de todo el recorrido, lo que constata que la cantidad de árboles por zona supera por mucho a la media global de la ciudad. La confirmación formal de que el arbolado se concentra en grandes agrupaciones a nivel general justifica el paso hacia el análisis espacial local, permitiendo verificar si la ubicación de esta infraestructura verde está vinculada a la capacidad económica de cada barrio.
+
+**Figura 2** *Análisis de patrón de puntos mediante las funciones G y K de Ripley.*
+```{r procesos-puntuales, results='hide', fig.width=12, fig.height=5}
+
+# Preparación geométrica y paso a formato ppp 
+valencia_proyectada <- sf::st_transform(secciones_economicas, crs = 25830)
+censo_arboles_proyectado <- sf::st_transform(censo_arboles, crs = 25830)
+
+valencia_contorno <- sf::st_union(valencia_proyectada)
+valencia_owin <- as.owin(sf::st_geometry(valencia_contorno))
+
+coordenadas <- sf::st_coordinates(censo_arboles_proyectado)
+arboles_ppp_completo <- ppp(x = coordenadas[, 1], y = coordenadas[, 2], window = valencia_owin, check = FALSE)
+
+# Fijamos una semilla para que el resultado sea reproducible al compilar
+set.seed(12345) 
+n_muestra <- base::round(arboles_ppp_completo$n * 0.10)
+arboles_ppp <- arboles_ppp_completo[base::sample(1:arboles_ppp_completo$n, n_muestra)]
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+
+# Función G (Vecino más cercano)
+env_g <- envelope(arboles_ppp, fun = Gest, nsim = 19, quiet = TRUE)
+plot(env_g, main = "Función G (Vecino más cercano)", xlab = "Distancia r (m)", ylab = "G(r)", las = 1)
+
+# Función K de Ripley multiescala
+env_k <- envelope(arboles_ppp, fun = Kest, nsim = 19, quiet = TRUE, verbose=FALSE)
+plot(env_k, main = "Función K de Ripley", xlab = "Distancia r (m)", ylab = "K(r)", las = 1)
+```
+
+```{r}
+match_palette <- function(patterns, classifications, colors){
+  classes_present <- base::unique(patterns)
+  mat <- matrix(c(classifications,colors), ncol = 2)
+  logi <- classifications %in% classes_present
+  pre_col <- matrix(mat[logi], ncol = 2)
+  pal <- pre_col[,2]
+  return(pal)
+}
+
+lisa_map <- function(df, lisa, alpha = .05) {
+  clusters <- lisa_clusters(lisa,cutoff = alpha)
+  labels <- lisa_labels(lisa)
+  pvalue <- lisa_pvalues(lisa)
+  colors <- lisa_colors(lisa)
+  lisa_patterns <- labels[clusters+1]
+  
+  pal <- match_palette(lisa_patterns,labels,colors)
+  labels <- labels[labels %in% lisa_patterns]
+  
+  df["lisa_clusters"] <- clusters
+  tm_shape(df) +
+    tm_fill("lisa_clusters", labels = labels, palette = pal, style = "cat")
+}
+
+```
+
+## Autocorrelación espacial 
+
+El análisis cuantitativo de la dependencia espacial general confirma la existencia de estructuras territoriales no aleatorias para las dos dimensiones de estudio en el municipio de Valencia. Los resultados del test global se presentan formalmente en la Tabla 1.
+
+**Tabla 1** *Resultados del Test de Autocorrelación Espacial Global.*
+```{r autocorrelacion-lisa, fig.width=14, fig.height=6}
+vecinos_queen <- spdep::poly2nb(secciones_finales, queen = TRUE)
+pesos_lista   <- spdep::nb2listw(vecinos_queen, style = "B")
+
+test_moran_renta <- spdep::moran.test(secciones_finales$renta_medio_hogar, listw = pesos_lista)
+test_moran_verde <- spdep::moran.test(secciones_finales$densidad_arboles_km2, listw = pesos_lista)
+
+# GENERACIÓN DE LA TABLA 
+datos_tabla <- data.frame(
+  Variable = c("Renta Media por Hogar", "Densidad de Arbolado Viario"),
+  Indice   = c(test_moran_renta$estimate[1], test_moran_verde$estimate[1]),
+  Esperanza = c(test_moran_renta$estimate[2], test_moran_verde$estimate[2]),
+  Varianza  = c(test_moran_renta$estimate[3], test_moran_verde$estimate[3]),
+  Z         = c(test_moran_renta$statistic, test_moran_verde$statistic),
+  P_valor   = c("< 2.2e-16", "< 2.2e-16")
+)
+
+# Renderizado simple en formato markdown. 
+knitr::kable(
+  datos_tabla, 
+  format = "markdown", 
+  digits = 5,
+  col.names = c("Variable Analizada", "Índice I de Moran", "Esperanza (E[I])", "Varianza (Var[I])", "Desviación Estándar (Z)", "p-valor"),
+  align = c("l", "c", "c", "c", "c", "c")
+)
+```
+
+El Índice de Moran Global para la variable Renta Media por Hogar muestra un coeficiente de $I = 0,651$ con un p-valor estadísticamente significativo ($p < 2,2 \times 10^{-16}$). Al acercarse tanto a un valor de uno, el índice demuestra una clara relación en el espacio, lo que confirma que los niveles de riqueza están muy divididos y se concentran de forma contigua en el mapa de la ciudad.
+
+De manera homóloga, la Densidad de Arbolado Viario por kilómetro cuadrado registra un índice de Moran global igualmente positivo y significativo de $I = 0,337$ ($p < 2,2 \times 10^{-16}$). El descarte formal de la hipótesis nula de aleatoriedad para ambos indicadores valida la presencia de un comportamiento estructural de agrupamiento en la ciudad, justificando el paso hacia el análisis espacial local.
+
+El mapa basado en los Indicadores Locales de Asociación Espacial (LISA) sirve para reflejar y localizar estas relaciones directamente en cada sección censal, tal y como se muestra en la Figure 1.
+
+**Figura 3** *Mapas de clústeres espaciales para la identificación de puntos calientes de Efecto Lujo en Valencia.*
+```{r}
+# 2. PASO LOCAL: Matriz de pesos y cálculo de indicadores LISA con rgeoda
+pesos_geoda <- rgeoda::queen_weights(secciones_finales)
+
+lisa_renta <- rgeoda::local_moran(pesos_geoda, secciones_finales['renta_medio_hogar'])
+lisa_verde <- rgeoda::local_moran(pesos_geoda, secciones_finales['densidad_arboles_km2'])
+
+# 3. CARTOGRAFÍA: Definimos los mapas individuales
+mapa_lisa_renta <- lisa_map(secciones_finales, lisa_renta) +
+  tmap::tm_layout(title = "LISA: Renta Media", legend.outside = TRUE)
+
+mapa_lisa_verde <- lisa_map(secciones_finales, lisa_verde) +
+  tmap::tm_layout(title = "LISA: Densidad Arbolado", legend.outside = TRUE)
+
+# SOLUCIÓN AL SOLAPAMIENTO: tmap_arrange fuerza la disposición en paralelo
+tmap::tmap_arrange(mapa_lisa_renta, mapa_lisa_verde, ncol = 2)
+```
+
+Al comparar ambos mapas en paralelo, salta a la vista un claro contraste entre riqueza económica y vegetación que contradice la idea inicial del Luxury Effect. En el núcleo central, el centro histórico y el Ensanche con barrios como Pla del Remei, Gran Via o Jaume Roig quedan delimitados por clústeres High-High en la variable económica, lo que demuestra una fuerte dependencia espacial donde las rentas elevadas tienden a concentrarse de forma contigua. Sin embargo, este mismo sector muestra una ausencia de significación estadística con zonas grises en la densidad de vegetación. Esta discrepancia evidencia que el estatus económico de las habitantes del centro no genera una asociación espacial con el arbolado debido a la morfología urbana del casco antiguo, cuyo trazado histórico de calles estrechas y compactas impide físicamente la plantación de un gran cantidad de árboles en las aceras. Sin embargo, esta falta de arbolado lineal en el centro se debe a un límite de los propios datos del estudio. Al medir únicamente los árboles viarios, el indicador ignora que los residentes de estas zonas de alto estatus disfrutan de la naturaleza a través de los grandes parques de su entorno, como el Jardín del Turia, el Parterre o el jardín del Antiguo Hospital, espacios que este censo viario no registra.
+
+En contraposición, el análisis de los datos regionales muestra patrones distintos en la periferia, donde la presencia o escasez de la infraestructura verde está estrechamente ligada a la similitud con sus distritos colindantes, confirmando el triunfo general del Legacy Effect sobre la riqueza actual. Por un lado, la zona marítima y el entorno portuario con El Grau y Nazaret representan un sector clave de Valencia que matiza nuestra hipótesis. Aquí se ratifica una clara autocorrelación espacial donde un clúster High-Low de renta, que indica ingresos altos rodeados de vecindarios humildes, se asocia de forma contigua con un clúster Low-Low de baja densidad verde. Esto es un reflejo de la tradición obrera e industrial cuyo crecimiento urbanístico consolidó un mapa de calles compactas donde apenas se reservó espacio para los árboles, demostrando que la riqueza reciente no puede revertir fácilmente el diseño del pasado. Por otro lado, los sectores de expansión del oeste y noroeste, como L'Olivereta, Nou Moles y de forma muy señalada el eje residencial creciente de la Avenida de las Cortes Valencianas, rompen con el patrón del dinero al consolidar potentes clústeres High-High de arbolado viario pese a registrar rentas medias-bajas. Esto confirma que la fecha de construcción crea zonas homogéneas, donde los barrios vecinos comparten un diseño idéntico en cuanto a la vegetación de sus calles, ya que el diseño moderno de estos barrios integra grandes avenidas que ofrecen mucho más espacio físico para plantar árboles (Pérez-Igualada et al., 2020). Finalmente, la escasez de arbolado en las pedanías del sur, como Castellar-Oliveral o Pinedo, se debe a un sesgo de la métrica. Al contar solo árboles en las calles, el indicador ignora la gran extensión de la Huerta Sur, reflejando una falsa falta de vegetación en una zona agrícola de alta riqueza ambiental.
+
+# CONCLUSIONES
+
+A la luz de los resultados obtenidos mediante el análisis de autocorrelación espacial, se confirma de manera sólida la hipótesis de que el arbolado viario de Valencia no sigue una distribución aleatoria ni uniforme, pero se debe rechazar la idea de que esta diferencia se deba exclusivamente al nivel de renta actual de los habitantes. Los datos reales no coinciden de forma limpia con el patrón esperado del Luxury Effect, revelando excepciones territoriales muy significativas. La evidencia demuestra que en Valencia tiene un peso significativamente mayor el Legacy Effect o Efecto Herencia, confirmando que la forma de las calles y la época en la que se construyó cada barrio actúan como los verdaderos motores del diseño verde. Los mapas de clústeres revelan que mientras el centro histórico y el Ensanche se ven limitados por su estrechez, las periferias modernas de rentas medias-bajas, como L'Olivereta, Nou Moles o la Avenida de las Cortes Valencianas, tienen una gran abundancia de árboles gracias a un diseño más moderno que integra por ley grandes avenidas (Pérez-Igualada et al., 2020.). El sector marítimo de El Grau y Nazaret refleja de forma clara este fenómeno, evidenciando una situación donde la convivencia de nuevas promociones de ingresos altos junto a vecindarios tradicionalmente humildes coexiste con una marcada escasez arbórea. Esto consolida un déficit socio-ambiental histórico derivado de su pasado obrero e industrial, demostrando que la reciente revalorización económica no logra revertir de forma automática la herencia gris del espacio urbano.
+
+Al reflexionar sobre estos resultados, se observa cómo la realidad de Valencia difiere de las conclusiones globales analizadas en estudios como el de McDonald et al. (2024), donde se asocia de forma casi lineal la abundancia de vegetación viaria con el poder adquisitivo de los vecinos. En el contexto local, el triunfo del Legacy Effect matiza esa visión global y demuestra que la injusticia ambiental en Valencia está fuertemente condicionada por la herencia del diseño urbanístico de cada época. Sin embargo, aunque la morfología del pasado predomine y explique la configuración actual, la planificación urbana moderna exige un equilibrio verde en todos los barrios de la ciudad por los beneficios críticos que aporta. Como explica el estudio de McDonald et al. (2024), los árboles funcionan como una infraestructura médica vital que amortigua las temperaturas extremas y reduce las visitas al hospital. Que este escudo natural frente al cambio climático falte en los entornos con menos recursos, sea de forma estructural o por herencia del diseño, consolida una desigualdad real con graves consecuencias en la salud pública. No corregir las carencias del tejido urbano tradicional se traduce en un perjuicio directo para sus poblaciones, penalizando doblemente a los ciudadanos más vulnerables.
+
+Para superar las limitaciones de este análisis y profundizar en la sostenibilidad real de la ciudad, las investigaciones futuras deberían orientarse hacia la incorporación de nuevas variables ecológicas ya que sería de gran valor evaluar no solo la cantidad, sino la calidad, el estado de salud y el tipo de especies que componen el arbolado viario. Del mismo modo, y para evitar el sesgo estadístico detectado en este trabajo, resulta indispensable integrar otras coberturas verdes esenciales como los parques cerrados urbanos o la riqueza ambiental de la Huerta Sur, cuya exclusión actual difumina el verdadero acceso al verde al evaluarse de forma aislada. Por último, se propone extender este análisis de autocorrelación a otras ciudades de características similares para comprobar si el patrón de desigualdad ambiental observado en Valencia, condicionado por la forma y el diseño de sus calles, se reproduce en otros entornos del ámbito regional y estatal.
+
+# REFERENCIAS
+
+Aznarez, C., Svenning, J. C., Pacheco, J. P., Kallesøe, F. H., Baró, F. y Pascual, U. (2023). Luxury and legacy effects on urban biodiversity, vegetation cover and ecosystem services. npj Urban Sustainability, 3(47), 1–11. <https://doi.org/10.1038/s42949-023-00128-7>
+
+Calderón, A. (4 de diciembre de 2025). Efecto Lujo: ¿por qué la naturaleza es un privilegio en muchas ciudades? Escuela Católica y Cuidado de la Casa Común. <https://ciec.edu.co/efecto-lujo-por-que-la-naturaleza-es-un-privilegio-en-muchas-ciudades/>
+
+Leong, M., Dunn, R. R. y Trautwein, M. D. (2018). Biodiversity and socioeconomics in the city: a review of the luxury effect. Biology Letters, 14(5), 1–6. <https://doi.org/10.1098/rsbl.2018.0082>
+
+McDonald, R. I., Biswas, T., Chakraborty, T. C., Kroeger, T., Cook-Patton, S. C. y Fargione, J. E. (2024). Current inequality and future potential of US urban tree cover for reducing heat-related health impacts. npj Urban Sustainability, 4(18), 1–16. <https://doi.org/10.1038/s42949-024-00150-3>
+
+Pérez-Igualada, J., Domingo Calabuig, D., Galiana Galán, F., y Vallés Planells, M. (2020). Morfología urbana y paisaje en los conjuntos de vivienda social en Valencia: estrategias proyectuales para la recomposición del espacio público. Departamento de Urbanismo / Departamento de Proyectos Arquitectónicos / Departamento de Ingeniería Rural y Agroalimentaria, Universitat Politècnica de València.
+
+Perkins, D., Mahmoudi, D., Henry, E. y Cooper, C. (2026). Geography of race and income shape spatial data gaps in two national participatory science projects. People and Nature, 8(5), 1485–1498. <https://doi.org/10.1002/pan3.70307>
+
+The Arbor Day Foundation y Food and Agriculture Organization of the United Nations. (s.f.). Recognised Cities. Tree Cities of the World. <https://treecitiesoftheworld.org/>
+
+# ANEXOS 
+
+El código fuente completo en lenguaje R utilizado para el análisis de este proyecto (limpieza de datos, funciones G y K de Ripley, e indicadores espaciales LISA) está disponible de forma pública para su consulta y reproducción en la plataforma GitHub.Debido al límite de tamaño de la plataforma, los datos cartográficos del seccionado censal deben descargarse externamente siguiendo las indicaciones del repositorio.
+
+Enlace al repositorio: <https://github.com/MiguelHidalgoSoriano/datos-espaciales-luxury-effect>
